@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import gsap from 'gsap';
+import GUI from 'lil-gui';
 
 const main = () => {
   // Canvas
@@ -30,10 +32,11 @@ const main = () => {
 
   // Object(s)
   const geometry = new THREE.BoxGeometry(1, 1, 1);
-  const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+  const material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true, flatShading: true });
   const mesh = new THREE.Mesh(geometry, material);
 
   scene.add(mesh);
+
 
   // Cursor Controls
   const cursor = {
@@ -74,7 +77,59 @@ const main = () => {
     window.requestAnimationFrame(tick);
   };
 
+  // Debug
+  const gui = new GUI({
+    width:300,
+    title: 'Debug Console',
+    closeFolders: false
+  });
+
+  const debugObject = {};
+  debugObject.subdivision = 2
+  debugObject.color = '#0xff0000';
+
+  // Object Properties
+  const cubeTweaks = gui.addFolder('Object Properties');
+
+  cubeTweaks
+    .add(mesh.position, 'y')
+    .min(-3)
+    .max(3)
+    .step(0.01)
+    .name('elevation');
+
+  cubeTweaks.add(material, 'wireframe');
+
+  cubeTweaks
+    .addColor(debugObject, 'color')
+    .onChange(() => {
+      material.color.set(debugObject.color);
+    });
+
+  cubeTweaks
+    .add(debugObject, 'subdivision')
+    .min(1)
+    .max(10)
+    .step(1)
+    .onChange(() => {
+      mesh.geometry.dispose()
+      mesh.geometry = new THREE.BoxGeometry(
+        1, 1, 1, 
+        debugObject.subdivision, // width segments
+        debugObject.subdivision, // height segments
+        debugObject.subdivision) // depth segments
+    });
+
+    debugObject.spin = () => {
+      gsap.to(mesh.rotation, {
+        duration: 1,
+        y: mesh.rotation.y + Math.PI * 2
+      });
+    };
+
+    cubeTweaks.add(debugObject, 'spin');
   return tick();
+
 };
 
 main();
