@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl');
@@ -38,6 +39,20 @@ camera.position.z = 3;
 
 scene.add(camera);
 
+// Cursor Controls
+const cursor = {
+  x:0,
+  y:0
+};
+window.addEventListener('mousemove', (event) => {
+  console.log(cursor.x, cursor.y)
+  cursor.x = event.clientX / sizes.width - 0.5;
+  cursor.y = event.clientY / sizes.height - 0.5; // negate for y axis
+});
+
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+
 // Renderer
 const renderer = new THREE.WebGL1Renderer({ canvas });
 renderer.setSize(sizes.width, sizes.height);
@@ -58,3 +73,15 @@ window.addEventListener('resize', () => {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.render(scene, camera);
 });
+
+const tick = () => {
+
+  controls.update();
+
+  // Render
+  renderer.render(scene, camera);
+  // Call tick again on the next frame
+  window.requestAnimationFrame(tick);
+};
+
+tick();
