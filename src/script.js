@@ -45,7 +45,6 @@ const cursor = {
   y:0
 };
 window.addEventListener('mousemove', (event) => {
-  console.log(cursor.x, cursor.y)
   cursor.x = event.clientX / sizes.width - 0.5;
   cursor.y = event.clientY / sizes.height - 0.5; // negate for y axis
 });
@@ -59,29 +58,49 @@ renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.render(scene, camera);
 
-window.addEventListener('resize', () => {
-  // Update Sizes
-  sizes.width = window.innerWidth;
-  sizes.height = window.innerHeight;
-
-  // Update Camera
-  camera.aspect = sizes.width / sizes.height;
-  camera.updateProjectionMatrix();
-
-  // Update Renderer
-  renderer.setSize(sizes.width, sizes.height);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.render(scene, camera);
-});
-
 const tick = () => {
 
   controls.update();
-
+  
   // Render
   renderer.render(scene, camera);
+
   // Call tick again on the next frame
   window.requestAnimationFrame(tick);
 };
 
+const handleResize = () => {
+  // Update Sizes
+  sizes.width = window.innerWidth;
+  sizes.height = window.innerHeight;
+  
+  // Update Camera
+  camera.aspect = sizes.width / sizes.height;
+  camera.updateProjectionMatrix();
+  
+  // Update Renderer
+  renderer.setSize(sizes.width, sizes.height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+};
+
+const toggleFullscreen = () => {
+  const fullscreenElement = document.fullscreenElement || document.webkitFullscreenElement;
+  
+  if (!fullscreenElement) {
+      const requestFullscreenMethod = canvas.requestFullscreen || canvas.webkitRequestFullscreen;
+      if (requestFullscreenMethod) {
+        requestFullscreenMethod.call(canvas);
+      }
+    } else {
+      const exitFullscreenMethod = document.exitFullscreen || document.webkitExitFullscreen;
+      if (exitFullscreenMethod) {
+        exitFullscreenMethod.call(document);
+      }
+    }
+  };
+  
 tick();
+
+// Listeners  
+window.addEventListener('resize', handleResize);
+window.addEventListener('dblclick', toggleFullscreen);
