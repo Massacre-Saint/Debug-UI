@@ -32,11 +32,16 @@ const main = () => {
 
   // Object(s)
   const geometry = new THREE.BoxGeometry(1, 1, 1);
-  const material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true, flatShading: true });
+  const material = new THREE.MeshBasicMaterial(
+    {
+      color: 0xff0000,
+      wireframe: true,
+      flatShading: true,
+    },
+  );
   const mesh = new THREE.Mesh(geometry, material);
 
   scene.add(mesh);
-
 
   // Cursor Controls
   const cursor = {
@@ -79,13 +84,13 @@ const main = () => {
 
   // Debug
   const gui = new GUI({
-    width:300,
+    width: 300,
     title: 'Debug Console',
-    closeFolders: false
+    closeFolders: false,
   });
 
   const debugObject = {};
-  debugObject.subdivision = 2
+  debugObject.subdivision = 2;
   debugObject.color = '#0xff0000';
 
   // Object Properties
@@ -112,24 +117,26 @@ const main = () => {
     .max(10)
     .step(1)
     .onChange(() => {
-      mesh.geometry.dispose()
+      mesh.geometry.dispose();
       mesh.geometry = new THREE.BoxGeometry(
-        1, 1, 1, 
+        1,
+        1,
+        1,
         debugObject.subdivision, // width segments
         debugObject.subdivision, // height segments
-        debugObject.subdivision) // depth segments
+        debugObject.subdivision,
+      ); // depth segments
     });
 
-    debugObject.spin = () => {
-      gsap.to(mesh.rotation, {
-        duration: 1,
-        y: mesh.rotation.y + Math.PI * 2
-      });
-    };
+  debugObject.spin = () => {
+    gsap.to(mesh.rotation, {
+      duration: 1,
+      y: mesh.rotation.y + Math.PI * 2,
+    });
+  };
 
-    cubeTweaks.add(debugObject, 'spin');
+  cubeTweaks.add(debugObject, 'spin');
   return tick();
-
 };
 
 main();
